@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>MCP Server</title>
+		<style>
+			body {
+				font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+				line-height: 1.6;
+			}
+			h1 {
+				color: #333;
+			}
+			textarea, input {
+				width: 100%;
+				padding: 10px;
+				margin: 10px 0;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+			}
+			button {
+				background-color: #0070f3;
+				color: white;
+				border: none;
+				padding: 10px 20px;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: #0051a2;
+			}
+			pre {
+				background-color: #f5f5f5;
+				padding: 15px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+			.response {
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>MCP Server Test Interface</h1>
+		<div>
+			<h2>Current File</h2>
+			<input type="text" id="filePath" placeholder="File path" value="src/index.ts" />
+			<textarea id="fileContent" rows="10" placeholder="File content"></textarea>
+			
+			<h2>Query</h2>
+			<textarea id="query" rows="3" placeholder="What would you like to ask about this code?"></textarea>
+			
+			<button id="submitBtn">Submit</button>
+		</div>
+		
+		<div class="response">
+			<h2>Response</h2>
+			<pre id="responseOutput">Submit a query to see the response...</pre>
+		</div>
+		
+		<script>
+			document.getElementById('submitBtn').addEventListener('click', async () => {
+				const filePath = document.getElementById('filePath').value;
+				const fileContent = document.getElementById('fileContent').value;
+				const query = document.getElementById('query').value;
+				
+				if (!fileContent || !query) {
+					alert('Please provide both file content and a query');
+					return;
+				}
+				
+				const request = {
+					context: {
+						currentFile: {
+							path: filePath,
+							content: fileContent
+						}
+					},
+					query: query
+				};
+				
+				try {
+					const response = await fetch('/api/mcp', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(request)
+					});
+					
+					const data = await response.json();
+					
+					if (response.ok) {
+						document.getElementById('responseOutput').textContent = data.response;
+					} else {
+						document.getElementById('responseOutput').textContent = 
+							`Error: ${data.error}\n${JSON.stringify(data, null, 2)}`;
+					}
+				} catch (error) {
+					document.getElementById('responseOutput').textContent = 
+						`Failed to send request: ${error.message}`;
+				}
+			});
+			
+			// Fetch server status on load
+			fetch('/message')
+				.then(resp => resp.text())
+				.then(text => {
+					console.log('Server status:', text);
+				})
+				.catch(err => {
+					console.error('Failed to check server status:', err);
+				});
+		</script>
+	</body>
+</html>
