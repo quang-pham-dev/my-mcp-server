@@ -2,6 +2,10 @@
 
 A modern AI service proxy built with Cloudflare Workers and Hono framework, supporting multiple AI providers including Anthropic Claude and OpenAI.
 
+<a href="https://glama.ai/mcp/servers/@quang-pham-dev/my-mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@quang-pham-dev/my-mcp-server/badge" alt="Server MCP server" />
+</a>
+
 ## Features
 
 - Multi-provider AI service integration (Anthropic Claude, OpenAI)
